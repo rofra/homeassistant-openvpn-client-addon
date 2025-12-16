@@ -3,7 +3,7 @@
   "version": "2.0.4",
   "slug": "openvpn_client",
   "description": "A secure way to send your data through any OpenVPN Server",
-  "url": "https://github.com/MapGuy11/homeassistant-openvpn-client-addon",
+  "url": "https://github.com/rofra/homeassistant-openvpn-client-addon",
   "arch": ["armhf", "armv7", "aarch64", "amd64", "i386"],
   "startup": "system",
   "init": "false",
