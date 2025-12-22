@@ -21,3 +21,5 @@ Clarification of the module usage
 Decryption password added in configuration
 # 2.0.6.2
 Custom user arguments added in configuration
+# 2.0.6.3
+Clarification of Authentication
