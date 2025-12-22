@@ -49,7 +49,7 @@ function check_files_available(){
 # Wait until the user has uploaded all required certificates and keys in order to setup the VPN connection.
 ########################################################################################################################
 function wait_configuration(){
-    echo "Waiting for user to put the OpenVPN configuration file in"
+    echo "Waiting for user to put the OpenVPN configuration file"
     # therefore, wait until the user upload the required certification files
     while true; do
         check_files_available
@@ -71,13 +71,13 @@ wait_configuration
 
 echo ""
 echo ""
-echo "Setting up the VPN connection with the following OpenVPN configuration: ${OPENVPN_CONFIG}"
+echo "Setting up the VPN connection with the following OpenVPN configuration file: ${OPENVPN_CONFIG}"
 echo ""
 echo ""
 
 PASS_OPTION=""
 if [[ -n "${OPENVPN_DECRYPTIONPASS}" ]]; then
-    echo "Private key password detected. Preparing password file..."
+    echo "Skipping certificate decryption password configuration detected. Preparing password file."
 
     PASS_FILE_PATH="/tmp/pass.txt"
     # Write the passphrase to a temporary file for the --askpass option
@@ -86,12 +86,12 @@ if [[ -n "${OPENVPN_DECRYPTIONPASS}" ]]; then
     chmod 600 "${PASS_FILE_PATH}"
     PASS_OPTION="--askpass ${PASS_FILE_PATH}"
 else
-    echo "No private key password provided. Skipping..."
+    echo "Skipping certificate decryption password."
 fi
 
 AUTH_OPTION=""
 if [[ -n "${USERNAME}" ]] && [[ -n "${PASSWORD}" ]]; then
-    echo "Authentication credentials detected. Preparing credentials file..."
+    echo "Basic authentication configuration detected. Preparing credentials file."
 
     AUTH_FILE_PATH="/tmp/auth.txt"
     # Securely write credentials to a temporary file
@@ -101,7 +101,7 @@ if [[ -n "${USERNAME}" ]] && [[ -n "${PASSWORD}" ]]; then
     chmod 600 "${AUTH_FILE_PATH}"
     AUTH_OPTION="--auth-user-pass ${AUTH_FILE_PATH}"
 else
-    echo "No VPN credentials provided. Skipping authentication..."
+    echo "Skipping basic authentication configuration."
 fi
 
 ARGS_OPTION=""
