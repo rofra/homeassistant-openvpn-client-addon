@@ -114,6 +114,5 @@ else
 fi
 
 
-# try to connect to the server using the user-defined configuration and credentials (if provided)
-echo "openvpn ${PASS_OPTION} ${AUTH_OPTION} --config ${OPENVPN_CONFIG}"
+# try to connect to the server
 openvpn ${PASS_OPTION} ${AUTH_OPTION} ${ARGS_OPTION} --config ${OPENVPN_CONFIG}
