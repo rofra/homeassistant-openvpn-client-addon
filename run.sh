@@ -4,7 +4,7 @@ set +u
 # Extract variables from module configuration
 CONFIG_PATH=/data/options.json
 OPENVPN_CONFIG="$(jq --raw-output '.ovpnfile' $CONFIG_PATH)"
-OPENVPN_CONFIG_PASS="$(jq --raw-output '.ovpnpassfile' $CONFIG_PATH)"
+OPENVPN_PASS="$(jq --raw-output '.ovpnpass' $CONFIG_PATH)"
 USERNAME="$(jq --raw-output '.username' $CONFIG_PATH)"
 PASSWORD="$(jq --raw-output '.password' $CONFIG_PATH)"
 
@@ -29,12 +29,6 @@ function check_files_available(){
 
     if [[ ! -f ${OPENVPN_CONFIG} ]]; then
         echo "Error: we could not find the OVPN file ${OPENVPN_CONFIG}"
-        echo ""
-        failed=1
-    fi
-
-    if [[ -n "${OPENVPN_CONFIG_PASS}" ]] && [[ ! -f ${OPENVPN_CONFIG_PASS} ]]; then
-        echo "Error: we could not find the password file ${OPENVPN_CONFIG_PASS}"
         echo ""
         failed=1
     fi
@@ -77,9 +71,13 @@ echo ""
 echo ""
 
 PASS_OPTION=""
-if [[ -n "${OPENVPN_CONFIG_PASS}" ]]; then
+if [[ -n "${OPENVPN_PASS}" ]]; then
     echo "Using private key password"
-    PASS_OPTION="--askpass ${OPENVPN_CONFIG_PASS}"
+
+    PASS_FILE_PATH="/tmp/pass.txt"
+    echo "${OPENVPN_PASS}" > ${PASS_FILE_PATH}
+    chmod 600 ${PASS_FILE_PATH}
+    PASS_OPTION="--askpass ${PASS_FILE_PATH}"
 else
     echo "No private key password file, skipping"
 fi
