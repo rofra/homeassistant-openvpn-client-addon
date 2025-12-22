@@ -22,15 +22,14 @@ Follow these steps to get up and running:
 3. **Configure Add-on:**
    - Go to the **Configuration** tab of the add-on.
    - Enter the full path to your config file (e.g., `/config/openvpn/client.ovpn`).
-   - Enter your **Username** and **Password** if required by your VPN provider.
 4. **Start:** Click **Start** and check the **Logs** tab to verify the connection.
 
 ## 🔐 Authentication Methods
 
 The add-on supports two main authentication flows:
 
+* **Certificate Decryption:** If your private key is encrypted, provide the password used to decrypt it.
 * **Basic Authentication:** Uses standard credentials (Username + Password).
-* **Certificate Decryption:** If your private key is encrypted, provide the path to the password file used to decrypt it.
 
 ---
 
