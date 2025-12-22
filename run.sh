@@ -1,21 +1,18 @@
 #!/usr/bin/env bash
 set +u
 
+# Extract variables from module configuration
 CONFIG_PATH=/data/options.json
-OPENVPN_CONFIG_PATH=/config
-
-OVPNFILE="$(jq --raw-output '.ovpnfile' $CONFIG_PATH)"
-OPENVPN_CONFIG=/config/${OVPNFILE}
-
+OPENVPN_CONFIG="$(jq --raw-output '.ovpnfile' $CONFIG_PATH)"
+OPENVPN_CONFIG_PASS="$(jq --raw-output '.ovpnpassfile' $CONFIG_PATH)"
 USERNAME="$(jq --raw-output '.username' $CONFIG_PATH)"
 PASSWORD="$(jq --raw-output '.password' $CONFIG_PATH)"
 
+# Prepare needed variables
+BASEDIRECTORY="/config/openvpn"
+
 ########################################################################################################################
 # Initialize the tun interface for OpenVPN if not already available
-# Arguments:
-#   None
-# Returns:
-#   None
 ########################################################################################################################
 function init_tun_interface(){
     # create the tunnel for the OpenVPN client
@@ -26,27 +23,23 @@ function init_tun_interface(){
 }
 ########################################################################################################################
 # Check if all required files are available.
-# Globals:
-#   REQUIRED_FILES
-#   STORAGE_LOCATION
-# Arguments:
-#   None
-# Returns:
-#   0 if all files are available and 1 otherwise
 ########################################################################################################################
 function check_files_available(){
     failed=0
 
-    if [[ ! -f ${OPENVPN_CONFIG} ]]
-    then
-        echo "We could not find your ${OPENVPN_CONFIG}. Did you put it in the ${OPENVPN_CONFIG_PATH} directory?"
+    if [[ ! -f ${OPENVPN_CONFIG} ]]; then
+        echo "Error: we could not find the OVPN file ${OPENVPN_CONFIG}"
         echo ""
         failed=1
-        break
     fi
 
-    if [[ ${failed} == 0 ]]
-    then
+    if [[ -n "${OPENVPN_CONFIG_PASS}" ]] && [[ ! -f ${OPENVPN_CONFIG_PASS} ]]; then
+        echo "Error: we could not find the password file ${OPENVPN_CONFIG_PASS}"
+        echo ""
+        failed=1
+    fi
+
+    if [[ ${failed} == 0 ]]; then
         return 0
     else
         return 1
@@ -55,22 +48,14 @@ function check_files_available(){
 
 ########################################################################################################################
 # Wait until the user has uploaded all required certificates and keys in order to setup the VPN connection.
-# Globals:
-#   REQUIRED_FILES
-#   CLIENT_CONFIG_LOCATION
-# Arguments:
-#   None
-# Returns:
-#   None
 ########################################################################################################################
 function wait_configuration(){
-    echo "Waiting for user to put the OpenVPN configuration file in ${OPENVPN_CONFIG_PATH}"
+    echo "Waiting for user to put the OpenVPN configuration file in"
     # therefore, wait until the user upload the required certification files
     while true; do
         check_files_available
 
-        if [[ $? == 0 ]]
-        then
+        if [[ $? == 0 ]]; then
             break
         fi
 
@@ -79,6 +64,7 @@ function wait_configuration(){
     echo "All files available!"
 }
 
+# init interfaces
 init_tun_interface
 
 # wait until the user uploaded the configuration files
@@ -90,18 +76,27 @@ echo "Setting up the VPN connection with the following OpenVPN configuration: ${
 echo ""
 echo ""
 
-AUTH_FILE="/etc/openvpn/auth.txt"
+PASS_OPTION=""
+if [[ -n "${OPENVPN_CONFIG_PASS}" ]]; then
+    echo "Using private key password"
+    PASS_OPTION="--askpass ${OPENVPN_CONFIG_PASS}"
+else
+    echo "No private key password file, skipping"
+fi
 
-if [[ -n "$USERNAME" ]] && [[ -n "$PASSWORD" ]]; then
+AUTH_OPTION=""
+if [[ -n "${USERNAME}" ]] && [[ -n "${PASSWORD}" ]]; then
     echo "Using provided username and password"
-    echo "$USERNAME" > $AUTH_FILE
-    echo "$PASSWORD" >> $AUTH_FILE
-    chmod 600 $AUTH_FILE
-    AUTH_OPTION="--auth-user-pass $AUTH_FILE"
+
+    AUTH_FILE_PATH="/tmp/auth.txt"
+    echo "${USERNAME}" > ${AUTH_FILE_PATH}
+    echo "${PASSWORD}" >> ${AUTH_FILE_PATH}
+    chmod 600 ${AUTH_FILE_PATH}
+    AUTH_OPTION="--auth-user-pass ${AUTH_FILE_PATH}"
 else
     echo "No username and password provided, skipping auth-user-pass"
-    AUTH_OPTION=""
 fi
 
 # try to connect to the server using the user-defined configuration and credentials (if provided)
-openvpn --config ${OPENVPN_CONFIG} $AUTH_OPTION
+echo "openvpn ${PASS_OPTION} ${AUTH_OPTION} --config ${OPENVPN_CONFIG}"
+openvpn ${PASS_OPTION} ${AUTH_OPTION} --config ${OPENVPN_CONFIG}

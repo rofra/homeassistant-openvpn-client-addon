@@ -1,0 +1,13 @@
+configuration:
+  ovpnfile:
+    name: "OpenVPN config file path"
+    description: "Full path to your .ovpn or .conf file. Example: /share/openvpn/client.ovpn"
+  ovpnpassfile:
+    name: "Certificate password file path"
+    description: "Path to the file containing the private key decryption password. Example: /share/openvpn/client.pass"
+  username:
+    name: "VPN Authentification credential: username"
+    description: "Username for VPN server authentication (if required). You must fill both username and password if used."
+  password:
+    name: "VPN Authentification credential: password"
+    description: "Password for VPN server authentication (if required). You must fill both username and password if used."

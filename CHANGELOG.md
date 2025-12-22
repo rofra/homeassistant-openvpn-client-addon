@@ -15,3 +15,5 @@ Final check it's all good to update fully now! The new client location is in the
 Add user and password management from the configuration tab if the OVPN server requires authentication. Thank you [@Izakun](https://github.com/Izakun) for the contribution!
 # 2.0.5
 Fix Docker Compose compilation failure on build
+# 2.0.6
+Clarification of the module usage
