@@ -1,13 +1,16 @@
 configuration:
   ovpnfile:
-    name: "OpenVPN config file path"
-    description: "Full path to your .ovpn or .conf file. Example: /config/openvpn/client.ovpn"
+    name: "OpenVPN Configuration Path"
+    description: "The absolute path to your .ovpn or .conf file. Example: /config/openvpn/client.ovpn"
   ovpnpass:
-    name: "Certificate decryption password"
-    description: "Decryption password to extract the Pricate certificate (optionnal)"
+    name: "Private Key Password"
+    description: "The password used to decrypt the private key certificate, if encrypted. Leave blank if not required."
   username:
-    name: "Basic Authentication: username"
-    description: "Username for authentication (optionnal). You must fill both username and password if used."
+    name: "VPN Service Username"
+    description: "The username provided by your VPN service for authentication. Leave blank if your connection uses certificates only."
   password:
-    name: "Basic Authentification: password"
-    description: "Password for authentication (optionnal). You must fill both username and password if used."
+    name: "VPN Service Password"
+    description: "The password provided by your VPN service for authentication. Leave blank if your connection uses certificates only."
+  customargs:
+    name: "Custom Launch Arguments"
+    description: "Additional command-line arguments to be passed to the OpenVPN binary. Leave blank for default behavior."

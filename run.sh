@@ -1,12 +1,17 @@
 #!/usr/bin/env bash
 set +u
 
+# Setup cleanup on exit
+trap 'rm -f /tmp/auth.txt /tmp/pass.txt; exit 0' SIGINT SIGTERM EXIT
+
 # Extract variables from module configuration
 CONFIG_PATH=/data/options.json
+
 OPENVPN_CONFIG="$(jq --raw-output '.ovpnfile' $CONFIG_PATH)"
-OPENVPN_PASS="$(jq --raw-output '.ovpnpass' $CONFIG_PATH)"
+OPENVPN_DECRYPTIONPASS="$(jq --raw-output '.ovpnpass' $CONFIG_PATH)"
 USERNAME="$(jq --raw-output '.username' $CONFIG_PATH)"
 PASSWORD="$(jq --raw-output '.password' $CONFIG_PATH)"
+CUSTOMARGS="$(jq --raw-output '.customargs' $CONFIG_PATH)"
 
 # Prepare needed variables
 BASEDIRECTORY="/config/openvpn"
@@ -71,30 +76,44 @@ echo ""
 echo ""
 
 PASS_OPTION=""
-if [[ -n "${OPENVPN_PASS}" ]]; then
-    echo "Using private key password"
+if [[ -n "${OPENVPN_DECRYPTIONPASS}" ]]; then
+    echo "Private key password detected. Preparing password file..."
 
     PASS_FILE_PATH="/tmp/pass.txt"
-    echo "${OPENVPN_PASS}" > ${PASS_FILE_PATH}
-    chmod 600 ${PASS_FILE_PATH}
+    # Write the passphrase to a temporary file for the --askpass option
+    printf "%s\n" "${OPENVPN_DECRYPTIONPASS}" > "${PASS_FILE_PATH}"
+    
+    chmod 600 "${PASS_FILE_PATH}"
     PASS_OPTION="--askpass ${PASS_FILE_PATH}"
 else
-    echo "No private key password file, skipping"
+    echo "No private key password provided. Skipping..."
 fi
 
 AUTH_OPTION=""
 if [[ -n "${USERNAME}" ]] && [[ -n "${PASSWORD}" ]]; then
-    echo "Using provided username and password"
+    echo "Authentication credentials detected. Preparing credentials file..."
 
     AUTH_FILE_PATH="/tmp/auth.txt"
-    echo "${USERNAME}" > ${AUTH_FILE_PATH}
-    echo "${PASSWORD}" >> ${AUTH_FILE_PATH}
-    chmod 600 ${AUTH_FILE_PATH}
+    # Securely write credentials to a temporary file
+    printf "%s\n" "${USERNAME}" > "${AUTH_FILE_PATH}"
+    printf "%s\n" "${PASSWORD}" >> "${AUTH_FILE_PATH}"
+    
+    chmod 600 "${AUTH_FILE_PATH}"
     AUTH_OPTION="--auth-user-pass ${AUTH_FILE_PATH}"
 else
-    echo "No username and password provided, skipping auth-user-pass"
+    echo "No VPN credentials provided. Skipping authentication..."
 fi
+
+ARGS_OPTION=""
+if [[ -n "${CUSTOMARGS}" ]]; then
+    echo "Applying custom OpenVPN arguments: ${CUSTOMARGS}"
+    # Assign without quotes to allow Bash to split multiple arguments correctly
+    ARGS_OPTION=${CUSTOMARGS}
+else
+    echo "No custom arguments provided. Using default configuration."
+fi
+
 
 # try to connect to the server using the user-defined configuration and credentials (if provided)
 echo "openvpn ${PASS_OPTION} ${AUTH_OPTION} --config ${OPENVPN_CONFIG}"
-openvpn ${PASS_OPTION} ${AUTH_OPTION} --config ${OPENVPN_CONFIG}
+openvpn ${PASS_OPTION} ${AUTH_OPTION} ${ARGS_OPTION} --config ${OPENVPN_CONFIG}

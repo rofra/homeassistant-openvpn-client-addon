@@ -17,3 +17,7 @@ Add user and password management from the configuration tab if the OVPN server r
 Fix Docker Compose compilation failure on build
 # 2.0.6
 Clarification of the module usage
+# 2.0.6.1
+Decryption password added in configuration
+# 2.0.6.2
+Custom user arguments added in configuration

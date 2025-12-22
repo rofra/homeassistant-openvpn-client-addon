@@ -1,13 +1,37 @@
-# Home Assistant OpenVPN Client Add-On
+# 🛡️ OpenVPN Client for Home Assistant
 
-## About: 
-This is an Add-On for [Home Assistant](https://www.home-assistant.io) which enables you to tunnel some or all the communication of your Home Assistant server with the world through an OpenVPN connection.
+This add-on enables you to tunnel your Home Assistant traffic through an **OpenVPN** connection. Depending on your configuration, you can route all or part of your server's communication through the VPN.
 
-Depending on how your OpenVPN connection is set up will determine the amount of traffic that flows through the VPN.
+## 🚀 Installation
 
-## Installation
-1. Go back to the **Add-on store**, click **⋮ → Repositories**, fill in</br>  `https://github.com/rofra/homeassistant-openvpn-client-addon` and click **Add → Close** or click the **Add repository** button below, click **Add → Close** (You may have to enter the **internal IP address** of your Home Assistant instance first).  
-[![Open your Home Assistant instance and show the add add-on repository dialog with a specific repository URL pre-filled.](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Frofra%2Fhomeassistant-openvpn-client-addon)
-2. Use a tool to copy your `.ovpn` file to the `/config` directory
-3. Go to the `Configuration` tab on the addon and input the file name with the extension there for the file you want to run.
-4. Start the addon in Home Assistant and you are good to go!
+1. Go to the **Add-on Store** in your Home Assistant instance.
+2. Click **⋮ (Menu) → Repositories**.
+3. Add the following URL:  
+   `https://github.com/rofra/homeassistant-openvpn-client-addon`
+4. Click **Add**, then **Close**.
+5. Find the **OpenVPN Client** add-on and click **Install**.
+
+[![Open Repository](https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg)](https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https%3A%2F%2Fgithub.com%2Frofra%2Fhomeassistant-openvpn-client-addon)
+
+## ⚙️ Setup & Configuration
+
+Follow these steps to get up and running:
+
+1. **Prepare Folders:** Create a directory named `openvpn` inside your `/config/` folder.
+2. **Upload Files:** Copy your `.ovpn` configuration file (and any required certificate or password files) into `/config/openvpn/`.
+3. **Configure Add-on:**
+   - Go to the **Configuration** tab of the add-on.
+   - Enter the full path to your config file (e.g., `/config/openvpn/client.ovpn`).
+   - Enter your **Username** and **Password** if required by your VPN provider.
+4. **Start:** Click **Start** and check the **Logs** tab to verify the connection.
+
+## 🔐 Authentication Methods
+
+The add-on supports two main authentication flows:
+
+* **Basic Authentication:** Uses standard credentials (Username + Password).
+* **Certificate Decryption:** If your private key is encrypted, provide the path to the password file used to decrypt it.
+
+---
+
+**Note:** Ensure the file paths in the configuration match the actual location of your files in the `/config/openvpn` directory.
