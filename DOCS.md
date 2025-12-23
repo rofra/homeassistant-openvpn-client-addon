@@ -22,7 +22,7 @@ The add-on dynamically adapts to your security requirements:
 
 * Credentials: Provide username and password. The add-on securely generates a temporary authentication file at runtime.
 
-* Encrypted Private Key: Use the ovpnpass field to provide the decryption passphrase.
+* Encrypted Private Key: Use the "Private key password" field to provide the decryption passphrase.
 
 ## Troubleshooting
 

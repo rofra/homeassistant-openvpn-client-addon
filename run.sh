@@ -115,4 +115,4 @@ fi
 
 
 # Launch openvpn client
-openvpn ${PASS_OPTION} ${AUTH_OPTION} ${ARGS_OPTION} --config ${OPENVPN_CONFIG}
+exec openvpn ${PASS_OPTION} ${AUTH_OPTION} ${ARGS_OPTION} --config ${OPENVPN_CONFIG}
