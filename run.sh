@@ -113,6 +113,5 @@ else
     echo "No custom arguments provided. Using default configuration."
 fi
 
-
 # Launch openvpn client
 exec openvpn ${PASS_OPTION} ${AUTH_OPTION} ${ARGS_OPTION} --config ${OPENVPN_CONFIG}

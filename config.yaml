@@ -10,6 +10,7 @@ arch:
   - amd64
   - i386
 startup: system
+init: false
 boot: auto
 host_network: true
 privileged:
