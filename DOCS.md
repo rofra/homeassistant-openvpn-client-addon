@@ -16,22 +16,28 @@ Follow these steps to get up and running:
 
 ## Authentication Methods
 
-The add-on supports two main authentication flows:
+The add-on dynamically adapts to your security requirements:
 
-* Certificate Decryption: If your private key is password-protected, use the Private Key Password field to provide the decryption passphrase.
-* Basic Authentication: Use the Username and Password fields for standard service credentials. These are securely handled in RAM during execution.
+* Certificate-only: Leave username and password blank.
+
+* Credentials: Provide username and password. The add-on securely generates a temporary authentication file at runtime.
+
+* Encrypted Private Key: Use the ovpnpass field to provide the decryption passphrase.
 
 ## Troubleshooting
 
-### Connection fails immediately
-Check the Logs tab. If you see "Infile not found", verify that the path in the configuration matches the actual file location in your config folder. Note that Linux is case-sensitive.
+1. Check the Logs: Most connection issues (auth failure, TLS errors) are explicitly detailed in the add-on Logs tab.
 
-### Authentication Failed
-Ensure you are using the correct credentials. Many VPN providers use specific "Service Credentials" for OpenVPN which are different from your main account login.
+2. File Permissions: Ensure your .ovpn file is readable and located in the correct /config/openvpn directory.
 
-### No internet access
-Some network configurations require specific arguments. You can try adding "--pull-filter ignore route-gateway" to the Custom Arguments field if you lose connectivity to your local network.
+3. DNS Issues: Depending on your VPN provider, you might need to add customargs: "--pull-filter ignore \"route-gateway\"" if you experience local network connectivity loss.
 
-## Security and Privacy
+## Security
 
-All sensitive data, such as passwords and passphrases, are stored in a temporary memory-based filesystem
+* Temporary Files: Credentials and passphrases are stored in /tmp/ (RAM) and are automatically deleted when the add-on stops.
+
+* Hardening: It is recommended to use a dedicated VPN account with limited privileges.
+
+## License
+
+MIT License. See LICENSE for more information.
