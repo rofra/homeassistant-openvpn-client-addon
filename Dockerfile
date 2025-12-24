@@ -1,15 +1,16 @@
 ARG BUILD_FROM
 FROM $BUILD_FROM
 
-ENV LANG C.UTF-8
+# Install only openvpn
+RUN apk add --no-cache openvpn
 
-# Install requirements for add-on
-RUN apk --no-cache --no-progress upgrade && \
-    apk --no-cache --no-progress add jq openvpn && \
-    rm -rf /tmp/*
+# Create the s6 service directory
+RUN mkdir -p /etc/services.d/openvpn
 
-# Copy data for add-on
-COPY run.sh /
-RUN chmod a+x /run.sh
+# Copy the script and rename it to 'run' for s6-overlay
+COPY run.sh /etc/services.d/openvpn/run
 
-CMD [ "/run.sh" ]
+# Grant execution permissions
+RUN chmod a+x /etc/services.d/openvpn/run
+
+# No CMD or ENTRYPOINT needed, s6 starts services in /etc/services.d/ automatically
