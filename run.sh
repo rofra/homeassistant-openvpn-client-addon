@@ -3,11 +3,13 @@ set -e
 
 # --- SETUP ---
 # Fetch options from Home Assistant
-OPENVPN_CONFIG=$(bashio::config 'ovpnfile')
+OVPN_RAW=$(bashio::config 'ovpncontent')
 OPENVPN_DECRYPTIONPASS=$(bashio::config 'ovpnpass')
 USERNAME=$(bashio::config 'username')
 PASSWORD=$(bashio::config 'password')
 CUSTOMARGS=$(bashio::config 'customargs')
+
+CLIENTFILEPATH="/tmp/client.ovpn"
 
 # --- TUN INTERFACE ---
 # Create device if missing
@@ -17,12 +19,22 @@ if [ ! -c /dev/net/tun ]; then
     mknod /dev/net/tun c 10 200
 fi
 
-# --- CONFIG CHECK ---
-# Wait for the configuration file to be available
-while ! bashio::fs.file_exists "${OPENVPN_CONFIG}"; do
-    bashio::log.warning "Waiting for configuration file"
-    sleep 10
-done
+# --- CONFIG PREPARATION ---
+if ! bashio::config.has_value 'ovpncontent'; then
+    bashio::log.error "The 'ovpncontent' list is empty. Please add items in the configuration."
+    exit 1
+fi
+
+bashio::log.info "Creating configuration file from list items..."
+# Clear the file first
+true > "${CLIENTFILEPATH}"
+
+bashio::log.info ${OVPN_RAW}
+
+# Correct way to iterate over a list in bashio without breaking on spaces
+# This reads the list from the JSON config and writes each item as a full line
+printf "%b" "${OVPN_RAW}" > "${CLIENTFILEPATH}"
+bashio::log.info "File created"
 
 # --- AUTHENTICATION ---
 PASS_OPTION=""
@@ -51,4 +63,4 @@ fi
 
 bashio::log.info "Starting OpenVPN"
 # Exec ensures OpenVPN handles termination signals properly
-exec openvpn ${PASS_OPTION} ${AUTH_OPTION} ${ARGS_OPTION} --config "${OPENVPN_CONFIG}"
+exec openvpn ${PASS_OPTION} ${AUTH_OPTION} ${ARGS_OPTION} --config "${CLIENTFILEPATH}"
